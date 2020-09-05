@@ -57,11 +57,11 @@ fi
 # files
 for i in $(seq 1 $NZ); do
     if [ "$i" -lt "10" ]; then
-        n=00${i}
+        n=00$i
     elif [ "$i" -lt "100" ]; then
-        n=0${i}
+        n=0$i
     else
-        n=${i}
+        n=$i
     fi
 
     f=${BASE}_hashed_${n}.zip
