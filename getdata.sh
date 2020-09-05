@@ -21,37 +21,37 @@ else
 fi
 
 f=Twitter_Elections_Integrity_Datasets_hashed_README.txt
-if [ ! -f ./${f} ]; then
+if [ ! -f ./"${f}" ]; then
     echo "Getting ${f}"
-    gsutil cp gs://twitter-election-integrity/hashed/2020_05/${f} .
+    gsutil cp gs://twitter-election-integrity/hashed/2020_05/"${f}" .
 fi
 
 # check if exists already, ask for removal
 if [ ! -d ${BASE} ]; then
     mkdir -p ${BASE}
 fi
-cd ${BASE}
+cd ${BASE} || exit
 
 # hashed users
 f=${BASE}_users_csv_hashed.zip
-if [ ! -f ./${f} ]; then
-    gsutil cp gs://${BUCKET}/${f} .
-    unzip ${f}
+if [ ! -f ./"${f}" ]; then
+    gsutil cp gs://${BUCKET}/"${f}" .
+    unzip -o "${f}"
 fi
 
 # tweets and metadata
 f=${BASE}_tweets_csv_hashed.zip
-if [ ! -f ./${f} ]; then
-    gsutil cp gs://${BUCKET}/${f} .
-    unzip ${f}
+if [ ! -f ./"${f}" ]; then
+    gsutil cp gs://${BUCKET}/"${f}" .
+    unzip -o "${f}"
 fi
 
 # media
 # README
 p=${BASE}_tweet_media_hashed
 f=${BASE}_hashed_README.txt
-if [ ! -f ./${f} ]; then
-    gsutil cp gs://${BUCKET}/${p}/${f} .
+if [ ! -f ./"${f}" ]; then
+    gsutil cp gs://${BUCKET}/${p}/"${f}" .
 fi
 
 # files
@@ -65,8 +65,8 @@ for i in $(seq 1 $NZ); do
     fi
 
     f=${BASE}_hashed_${n}.zip
-    if [ ! -f ./${f} ]; then
-        gsutil cp gs://${BUCKET}/${p}/${f} .
-        unzip ${f}
+    if [ ! -f ./"${f}" ]; then
+        gsutil cp gs://${BUCKET}/${p}/"${f}" .
+        unzip -o "${f}"
     fi
 done
