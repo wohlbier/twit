@@ -7,8 +7,14 @@ if [ "$1" = "china" ]; then
     NZ=17
 elif [ "$1" = "russia" ]; then
     echo "getting russia data"
+    BUCKET="twitter-election-integrity/hashed/2020_05/russia_052020"
+    BASE="russia_052020"
+    NZ=54
 elif [ "$1" = "turkey" ]; then
     echo "getting turkey data"
+    BUCKET="twitter-election-integrity/hashed/2020_05/turkey_052020"
+    BASE="turkey_052020"
+    NZ=391
 else
     echo "need to specify china, russia, or turkey"
     exit 1
@@ -51,11 +57,11 @@ fi
 # files
 for i in $(seq 1 $NZ); do
     if [ "$i" -lt "10" ]; then
-        n=00$i
+        n=00${i}
     elif [ "$i" -lt "100" ]; then
-        n=0$i
+        n=0${i}
     else
-        n=0$i
+        n=${i}
     fi
 
     f=${BASE}_hashed_${n}.zip
