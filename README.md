@@ -1,7 +1,13 @@
 # twit
 
 ```
-conda create -n twit_env -c conda-forge gsutil python=3 unzip
+conda create -n twit_env -c conda-forge \
+      gsutil \
+      numpy \
+      pandas \
+      python \
+      scipy \
+      unzip
 conda activate twit_env
 ```
 
