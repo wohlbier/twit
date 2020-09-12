@@ -3,6 +3,14 @@
 import numpy as np
 import pandas as pd
 from scipy import sparse
+import torch
+
+class Data:
+    def __init__(self, edge_index, edge_adj, X, y):
+        self.edge_index = edge_index
+        self.edge_adj = edge_adj
+        self.X = X
+        self.y = y
 
 if __name__ == "__main__":
 
@@ -77,17 +85,29 @@ if __name__ == "__main__":
     u_id = {k: v for v, k in enumerate(id_u)}
 
     # each retweet is an edge and size is the value
-    r = np.zeros(len(retweets))
-    c = np.zeros(len(retweets))
-    d = np.zeros(len(retweets))
+    r = np.zeros(len(retweets), dtype=int)
+    c = np.zeros(len(retweets), dtype=int)
+    d = np.zeros(len(retweets), dtype=int)
 
     for index, row in retweets.iterrows():
         r[index] = u_id[row['userid']]
         c[index] = u_id[row['retweet_userid']]
         d[index] = row['size']
 
-    # csr_matrix((data, (row_ind, col_ind)), [shape=(M, N)])
-    adj = sparse.csr_matrix((d, (r, c)), (len(id_u),len(id_u)), dtype=np.int8)
+    edge_index = torch.from_numpy(np.transpose(np.column_stack((r,c))))
+    edge_adj = torch.from_numpy(d)
 
-    print(adj)
-    print(len(id_u))
+    # create some data
+    n_feat = 10
+    X = torch.zeros((len(id_u), n_feat))
+    y = torch.zeros(len(id_u))
+
+    data = Data(edge_index, edge_adj, X, y)
+    torch.save(data, 't.pt')
+
+
+    # csr_matrix((data, (row_ind, col_ind)), [shape=(M, N)])
+    #adj = sparse.csr_matrix((d, (r, c)), (len(id_u),len(id_u)), dtype=np.int8)
+
+    #print(adj)
+    #print(len(id_u))
