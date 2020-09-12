@@ -1,5 +1,10 @@
 # twit
 
+number of tweets:
+china:     427903
+russia:   4373218
+turkey: 120253807
+
 ```
 conda create -n twit_env -c conda-forge \
       gsutil \
