@@ -20,14 +20,14 @@ if __name__ == "__main__":
         #'account_creation_date',
         #'account_language',
         #'tweet_language',
-        #'tweet_text',
+        'tweet_text',
         #'tweet_time',
         #'tweet_client_name',
         #'in_reply_to_userid',
         #'in_reply_to_tweetid',
         #'quoted_tweet_tweetid',
-        'is_retweet',
-        'retweet_userid'
+        'is_retweet'
+        #'retweet_userid',
         #'retweet_tweetid',
         #'latitude',
         #'longitude',
@@ -45,13 +45,23 @@ if __name__ == "__main__":
     #'in_reply_to_userid': str, # will result in DtypeWarning: without this
     #'retweet_tweetid': str,    # will result in DtypeWarning: without this
 
+    # get retweets
+    retweets = df.loc[df['is_retweet'] == True]
+    # add retweet_userid by taking [1] from tweet_text instead of using
+    # retweet_userid from data, which can be empty
+    retweets = retweets. \
+        assign(retweet_userid=retweets.tweet_text.str.split(expand=True)[1])
+
+    # pick out unique retweets
     rt_cols = [
         'userid',
         'is_retweet',
         'retweet_userid'
     ]
-    retweets = (df.loc[df['is_retweet'] == True]) \
+    retweets = (retweets.loc[retweets['is_retweet'] == True]) \
         .groupby(rt_cols, as_index=False).size()
+
+    #print(retweets.columns)
 
     #for i in range(len(retweets)):
     #    print(retweets.iloc[i])
@@ -59,10 +69,10 @@ if __name__ == "__main__":
     # node index is user index. get list of users from full dataset since
     # user can retweet a user that doesn't retweet.
 
-    # id_u: node id to userid by finding unique userid
-    id_u = list(df['userid'].unique())
-    id_u = [''] + id_u # prepend user '' for empty retweet_userid's
-
+    # id_u: node id to userid by finding unique userid and unique
+    # retweet_userid
+    id_u = list(pd.unique(retweets[['userid','retweet_userid']].\
+                          values.ravel('K')))
     # u_id: dict k=userid, v=node id
     u_id = {k: v for v, k in enumerate(id_u)}
 
@@ -80,3 +90,4 @@ if __name__ == "__main__":
     adj = sparse.csr_matrix((d, (r, c)), (len(id_u),len(id_u)), dtype=np.int8)
 
     print(adj)
+    print(len(id_u))
