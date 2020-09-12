@@ -7,7 +7,7 @@ from scipy import sparse
 if __name__ == "__main__":
 
     # select columns of interest
-    cols=[
+    read_cols=[
         #'tweetid',
         'userid',
         #'user_display_name',
@@ -40,13 +40,18 @@ if __name__ == "__main__":
         #'user_mentions'
     ]
 
-    f = "./china_052020/china_052020_tweets_csv_hashed.csv"
-    df = pd.read_csv(f, keep_default_na=False, usecols=cols)
+    f = "/DATA/SDH/twitter/election-integrity/china_052020/china_052020_tweets_csv_hashed.csv"
+    df = pd.read_csv(f, keep_default_na=False, usecols=read_cols)
     #'in_reply_to_userid': str, # will result in DtypeWarning: without this
     #'retweet_tweetid': str,    # will result in DtypeWarning: without this
 
+    rt_cols = [
+        'userid',
+        'is_retweet',
+        'retweet_userid'
+    ]
     retweets = (df.loc[df['is_retweet'] == True]) \
-        .groupby(cols, as_index=False).size()
+        .groupby(rt_cols, as_index=False).size()
 
     #for i in range(len(retweets)):
     #    print(retweets.iloc[i])
@@ -72,7 +77,6 @@ if __name__ == "__main__":
         d[index] = row['size']
 
     # csr_matrix((data, (row_ind, col_ind)), [shape=(M, N)])
-    # adj[row_ind[k], col_ind[k]] = data[k].
     adj = sparse.csr_matrix((d, (r, c)), (len(id_u),len(id_u)), dtype=np.int8)
 
     print(adj)
