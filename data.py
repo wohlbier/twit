@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from datetime import datetime
 import numpy as np
 import pandas as pd
 from scipy import sparse
@@ -14,8 +15,10 @@ class Data:
 
 if __name__ == "__main__":
 
+    # read data
+
     # select columns of interest
-    read_cols=[
+    read_tweet_cols=[
         #'tweetid',
         'userid',
         #'user_display_name',
@@ -47,18 +50,49 @@ if __name__ == "__main__":
         #'urls',
         #'user_mentions'
     ]
+    path = '/DATA/SDH/twitter/election-integrity/china_052020'
+    base = 'china_052020'
+    f = path + '/' +  base +  "_tweets_csv_hashed.csv"
 
-    f = "/DATA/SDH/twitter/election-integrity/china_052020/china_052020_tweets_csv_hashed.csv"
-    df = pd.read_csv(f, keep_default_na=False, usecols=read_cols)
+    # tweet dataframe
+    tdf = pd.read_csv(f, keep_default_na=False, usecols=read_tweet_cols)
     #'in_reply_to_userid': str, # will result in DtypeWarning: without this
     #'retweet_tweetid': str,    # will result in DtypeWarning: without this
 
-    # get retweets
-    retweets = df.loc[df['is_retweet'] == True]
+    # now get users
+    read_user_cols = [
+        'userid',
+        #'user_display_name',
+        #'user_screen_name',
+        #'user_reported_location',
+        #'user_profile_description',
+        #'user_profile_url',
+        'follower_count',
+        'following_count',
+        'account_creation_date',
+        'account_language'
+    ]
+    f = path + '/' +  base +  "_users_csv_hashed.csv"
+    # users dataframe
+    udf = pd.read_csv(f, usecols=read_user_cols)
+
+    # tweets
+
     # add retweet_userid by taking [1] from tweet_text instead of using
-    # retweet_userid from data, which can be empty
-    retweets = retweets. \
-        assign(retweet_userid=retweets.tweet_text.str.split(expand=True)[1])
+    # retweet_userid from data, which can be empty. Do the assignment
+    # only if is a retweet.
+    tdf['retweet_userid'] = np.where(tdf.is_retweet == True,
+                                     tdf.tweet_text.str.split(expand=True)[1],
+                                     '')
+    # remove @ in RT
+    tdf['retweet_userid'] = tdf['retweet_userid'].str.replace("@","")
+    # remove trailing : in RT
+    tdf['retweet_userid'] = tdf['retweet_userid'].str.replace(":","")
+
+    # retweets
+
+    # get retweets
+    retweets = tdf.loc[tdf['is_retweet'] == True]
 
     # pick out unique retweets
     rt_cols = [
@@ -66,21 +100,19 @@ if __name__ == "__main__":
         'is_retweet',
         'retweet_userid'
     ]
-    retweets = (retweets.loc[retweets['is_retweet'] == True]) \
-        .groupby(rt_cols, as_index=False).size()
+    #retweets = (retweets.loc[retweets['is_retweet'] == True]) \
+    #    .groupby(rt_cols, as_index=False).size()
+    retweets = retweets.groupby(rt_cols, as_index=False).size()
 
-    #print(retweets.columns)
-
-    #for i in range(len(retweets)):
-    #    print(retweets.iloc[i])
-
-    # node index is user index. get list of users from full dataset since
+    # node index is user index. get list of users from full tdf dataset since
     # user can retweet a user that doesn't retweet.
 
-    # id_u: node id to userid by finding unique userid and unique
-    # retweet_userid
-    id_u = list(pd.unique(retweets[['userid','retweet_userid']].\
+    # id_u: node id to userid by finding unique userid & unique retweet_userid
+    id_u = list(pd.unique(tdf[['userid','retweet_userid']].\
                           values.ravel('K')))
+    #  append users from udf, use set and list to get unique hashes
+    id_u = list(set(np.append(id_u, list(pd.unique(udf['userid'])))))
+
     # u_id: dict k=userid, v=node id
     u_id = {k: v for v, k in enumerate(id_u)}
 
@@ -94,13 +126,26 @@ if __name__ == "__main__":
         c[index] = u_id[row['retweet_userid']]
         d[index] = row['size']
 
+    # make edges
     edge_index = torch.from_numpy(np.transpose(np.column_stack((r,c))))
     edge_adj = torch.from_numpy(d)
 
-    # create some data
-    n_feat = 10
+    # add features
+    n_feat = len(read_user_cols) - 1
     X = torch.zeros((len(id_u), n_feat))
     y = torch.zeros(len(id_u))
+
+    for index, row in udf.iterrows():
+        node_idx = u_id[row['userid']]
+        X[node_idx,0] = row['follower_count']
+        X[node_idx,1] = row['following_count']
+        X[node_idx,2] = datetime.fromisoformat(row['account_creation_date']).\
+            timestamp()/1.0e9
+        l = row['account_language']
+        s = 0
+        for c in l:
+            s += ord(c)
+        X[node_idx,3] = s
 
     data = Data(edge_index, edge_adj, X, y)
     torch.save(data, 't.pt')
