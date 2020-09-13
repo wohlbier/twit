@@ -5,13 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 import torch
-
-class Data:
-    def __init__(self, edge_index, edge_adj, X, y):
-        self.edge_index = edge_index
-        self.edge_adj = edge_adj
-        self.X = X
-        self.y = y
+from torch_geometric.data import Data
 
 if __name__ == "__main__":
 
@@ -112,14 +106,15 @@ if __name__ == "__main__":
                           values.ravel('K')))
     #  append users from udf, use set and list to get unique hashes
     id_u = list(set(np.append(id_u, list(pd.unique(udf['userid'])))))
+    num_nodes = len(id_u)
 
     # u_id: dict k=userid, v=node id
     u_id = {k: v for v, k in enumerate(id_u)}
 
     # each retweet is an edge and size is the value
-    r = np.zeros(len(retweets), dtype=int)
-    c = np.zeros(len(retweets), dtype=int)
-    d = np.zeros(len(retweets), dtype=int)
+    r = np.zeros(len(retweets), dtype=np.int_)
+    c = np.zeros(len(retweets), dtype=np.int_)
+    d = np.zeros(len(retweets), dtype=np.int_)
 
     for index, row in retweets.iterrows():
         r[index] = u_id[row['userid']]
@@ -132,8 +127,8 @@ if __name__ == "__main__":
 
     # add features
     n_feat = len(read_user_cols) - 1
-    X = torch.zeros((len(id_u), n_feat))
-    y = torch.zeros(len(id_u))
+    X = torch.zeros((num_nodes, n_feat))
+    y = torch.zeros(num_nodes)
 
     for index, row in udf.iterrows():
         node_idx = u_id[row['userid']]
@@ -147,12 +142,12 @@ if __name__ == "__main__":
             s += ord(c)
         X[node_idx,3] = s
 
-    data = Data(edge_index, edge_adj, X, y)
+    data = Data(x=X,edge_index=edge_index, edge_attr=edge_adj, y=y)
+    print(data.num_classes)
     torch.save(data, 't.pt')
 
-
     # csr_matrix((data, (row_ind, col_ind)), [shape=(M, N)])
-    #adj = sparse.csr_matrix((d, (r, c)), (len(id_u),len(id_u)), dtype=np.int8)
+    #adj = sparse.csr_matrix((d, (r, c)), (num_nodes,num_nodes), dtype=np.int8)
 
     #print(adj)
-    #print(len(id_u))
+    #print(num_nodes)
