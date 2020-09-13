@@ -143,9 +143,19 @@ if __name__ == "__main__":
         X[node_idx,3] = s
 
     data = Data(x=X,edge_index=edge_index, edge_attr=edge_adj, y=y)
-    print(data.num_classes)
+    data.num_classes = 1 # hardwire this
+
+    # fake some test, train, val masks
+    dist = np.random.rand(num_nodes)
+    t = 0.6 # training  0.0 < t < t+v < 1.0
+    v = 0.2 # val
+    data.train_mask = torch.from_numpy((dist<t))
+    data.test_mask = torch.from_numpy((t<dist)&(dist<t+v))
+    data.val_mask = torch.from_numpy((t+v<dist))
+
     torch.save(data, 't.pt')
 
+    print(data)
     # csr_matrix((data, (row_ind, col_ind)), [shape=(M, N)])
     #adj = sparse.csr_matrix((d, (r, c)), (num_nodes,num_nodes), dtype=np.int8)
 

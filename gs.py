@@ -84,20 +84,18 @@ if __name__ == "__main__":
     #dataset = torch.load(f)
     #data = dataset[0]
     data = torch.load(f)
-    data.num_classes = 1 # hardwire
 
     row, col = data.edge_index
     data.edge_weight = 1. / degree(col, data.num_nodes)[col]  # Norm by in-deg.
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--use_normalization', action='store_true')
+    parser.add_argument('--use-normalization', action='store_true')
     args = parser.parse_args()
 
     loader = GraphSAINTRandomWalkSampler(data, batch_size=6000, walk_length=2,
                                          num_steps=5, sample_coverage=100,
                                          save_dir='./processed',
-                                         num_workers=4)
-
+                                         num_workers=0) #4
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net(hidden_channels=256).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
