@@ -11,6 +11,7 @@ class RetweetDataset(InMemoryDataset):
 
     @property
     def raw_file_names(self):
+        # these aren't correct
         return ['china_052020_tweets_csv_hashed.csv',
                 'china_052020_users_csv_hashed.csv']
 
@@ -19,71 +20,91 @@ class RetweetDataset(InMemoryDataset):
         return ['rt.pt']
 
     def download(self):
-        # Download to `self.raw_dir`.
+        # Download to `self.raw_dir`, which is root + '/raw'
         print('already dl')
 
     def process(self):
 
-        # read data
+        def read_tweets(countries):
+            # select columns of interest
+            read_tweet_cols=[
+                #'tweetid',
+                'userid',
+                #'user_display_name',
+                #'user_screen_name',
+                #'user_reported_location',
+                #'user_profile_description',
+                #'user_profile_url',
+                #'follower_count',
+                #'following_count',
+                #'account_creation_date',
+                #'account_language',
+                #'tweet_language',
+                'tweet_text',
+                #'tweet_time',
+                #'tweet_client_name',
+                #'in_reply_to_userid',
+                #'in_reply_to_tweetid',
+                #'quoted_tweet_tweetid',
+                'is_retweet'
+                #'retweet_userid',
+                #'retweet_tweetid',
+                #'latitude',
+                #'longitude',
+                #'quote_count',
+                #'reply_count',
+                #'like_count',
+                #'retweet_count',
+                #'hashtags',
+                #'urls',
+                #'user_mentions'
+            ]
 
-        # select columns of interest
-        read_tweet_cols=[
-            #'tweetid',
-            'userid',
-            #'user_display_name',
-            #'user_screen_name',
-            #'user_reported_location',
-            #'user_profile_description',
-            #'user_profile_url',
-            #'follower_count',
-            #'following_count',
-            #'account_creation_date',
-            #'account_language',
-            #'tweet_language',
-            'tweet_text',
-            #'tweet_time',
-            #'tweet_client_name',
-            #'in_reply_to_userid',
-            #'in_reply_to_tweetid',
-            #'quoted_tweet_tweetid',
-            'is_retweet'
-            #'retweet_userid',
-            #'retweet_tweetid',
-            #'latitude',
-            #'longitude',
-            #'quote_count',
-            #'reply_count',
-            #'like_count',
-            #'retweet_count',
-            #'hashtags',
-            #'urls',
-            #'user_mentions'
-        ]
-        path = '/DATA/SDH/twitter/election-integrity/china_052020'
-        base = 'china_052020'
-        f = path + '/' +  base +  "_tweets_csv_hashed.csv"
+            li = []
+            for s in states:
+                base = s + '_052020'
+                path = '/DATA/SDH/twitter/election-integrity' + '/' + base
+                f = path + '/' +  base +  "_tweets_csv_hashed.csv"
+                print('reading: ' + f)
+                # tweet dataframe
+                df = pd.read_csv(f, usecols=read_tweet_cols)
+                df['state'] = s
+                li.append(df)
+            return pd.concat(li, axis=0, ignore_index=True)
 
-        # tweet dataframe
-        tdf = pd.read_csv(f, keep_default_na=False, usecols=read_tweet_cols)
-        #'in_reply_to_userid': str, # will result in DtypeWarning: without this
-        #'retweet_tweetid': str,    # will result in DtypeWarning: without this
+        def read_users(states):
+            read_user_cols = [
+                'userid',
+                #'user_display_name',
+                #'user_screen_name',
+                #'user_reported_location',
+                #'user_profile_description',
+                #'user_profile_url',
+                'follower_count',
+                'following_count',
+                'account_creation_date',
+                'account_language'
+            ]
+            li = []
+            for s in states:
+                base = s + '_052020'
+                path = '/DATA/SDH/twitter/election-integrity' + '/' + base
+                f = path + '/' +  base +  "_users_csv_hashed.csv"
+                print('reading: ' + f)
+                # tweet dataframe
+                df = pd.read_csv(f, usecols=read_user_cols)
+                df['state'] = s
+                li.append(df)
+            return pd.concat(li, axis=0, ignore_index=True)
 
-        # now get users
-        read_user_cols = [
-            'userid',
-            #'user_display_name',
-            #'user_screen_name',
-            #'user_reported_location',
-            #'user_profile_description',
-            #'user_profile_url',
-            'follower_count',
-            'following_count',
-            'account_creation_date',
-            'account_language'
-        ]
-        f = path + '/' +  base +  "_users_csv_hashed.csv"
+        # china:  23,787 users,     427,903 tweets
+        # russia:  1,205 users,   4,373,218 tweets
+        # turkey:  9,511 users, 120,253,807 tweets
+        states = ['china', 'russia']
+        tdf = read_tweets(states)
+
         # users dataframe
-        udf = pd.read_csv(f, usecols=read_user_cols)
+        udf = read_users(states)
 
         # tweets
 
@@ -140,13 +161,14 @@ class RetweetDataset(InMemoryDataset):
         edge_adj = torch.from_numpy(d)
 
         # add features
-        n_feat = len(read_user_cols) - 1
+        n_feat = len(udf.columns) - 1
         X = torch.zeros((num_nodes, n_feat))
-        n_classes = 2
-        y = torch.randint(0, 3, (num_nodes,))
+        y = torch.zeros((num_nodes),dtype=torch.int_)
 
+        sv = {k: v for v, k in enumerate(states)}
         for index, row in udf.iterrows():
             node_idx = u_id[row['userid']]
+            y[node_idx] = sv[row['state']]
             X[node_idx,0] = row['follower_count']
             X[node_idx,1] = row['following_count']
             X[node_idx,2] = datetime.\

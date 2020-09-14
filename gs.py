@@ -90,7 +90,7 @@ if __name__ == "__main__":
     model = Net(hidden_channels=256).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-    for epoch in range(1, 51):
+    for epoch in range(1000):
         loss = train()
         accs = test()
         print(f'Epoch: {epoch:02d}, Loss: {loss:.4f}, Train: {accs[0]:.4f}, '
