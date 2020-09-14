@@ -13,8 +13,8 @@ from torch_geometric.utils import degree
 class Net(torch.nn.Module):
     def __init__(self, hidden_channels):
         super(Net, self).__init__()
-        in_channels = data.num_node_features
-        out_channels = data.num_classes
+        in_channels = dataset.num_node_features
+        out_channels = dataset.num_classes
         self.conv1 = GraphConv(in_channels, hidden_channels)
         self.conv2 = GraphConv(hidden_channels, hidden_channels)
         self.conv3 = GraphConv(hidden_channels, hidden_channels)
@@ -75,33 +75,42 @@ def test():
     return accs
 
 if __name__ == "__main__":
-    #path = osp.join(osp.dirname(osp.realpath(__file__)),
-    #                '..', 'data', 'Flickr')
-    #dataset = Flickr(path)
-    #data = dataset[0]
+    path = osp.join(osp.dirname(osp.realpath(__file__)),
+                    '..', 'data', 'Flickr')
+#    dataset = Flickr(path)
+#    data = dataset[0]
+#
+#    print(vars(dataset[0]))
+#    print(dataset.num_node_features)
+#    print(dataset.num_classes)
 
     f = './t.pt'
-    #dataset = torch.load(f)
-    #data = dataset[0]
-    data = torch.load(f)
+    dataset = torch.load(f)
+    data = dataset[0]
+    print(dataset.num_node_features)
 
-    row, col = data.edge_index
-    data.edge_weight = 1. / degree(col, data.num_nodes)[col]  # Norm by in-deg.
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--use-normalization', action='store_true')
-    args = parser.parse_args()
-
-    loader = GraphSAINTRandomWalkSampler(data, batch_size=6000, walk_length=2,
-                                         num_steps=5, sample_coverage=100,
-                                         save_dir='./processed',
-                                         num_workers=0) #4
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = Net(hidden_channels=256).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-    for epoch in range(1, 51):
-        loss = train()
-        accs = test()
-        print(f'Epoch: {epoch:02d}, Loss: {loss:.4f}, Train: {accs[0]:.4f}, '
-              f'Val: {accs[1]:.4f}, Test: {accs[2]:.4f}')
+#    #data.num_classes = 1 # hardwire this
+#
+#    print(dataset)
+#
+#    row, col = data.edge_index
+#    data.edge_weight = 1. / degree(col, data.num_nodes)[col]  # Norm by in-deg.
+#
+#    parser = argparse.ArgumentParser()
+#    parser.add_argument('--use_normalization', action='store_true')
+#    args = parser.parse_args()
+#    #Data(edge_attr=[121104], edge_index=[2, 121104], edge_weight=[121104], num_classes=1, test_mask=[40134], train_mask=[40134], val_mask=[40134], x=[40134, 4], y=[40134])
+#    print(data)
+#    loader = GraphSAINTRandomWalkSampler(data, batch_size=6000, walk_length=2,
+#                                         num_steps=5, sample_coverage=100,
+#                                         save_dir='./processed',
+#                                         num_workers=4)
+#    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#    model = Net(hidden_channels=256).to(device)
+#    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+#
+#    for epoch in range(1, 51):
+#        loss = train()
+#        accs = test()
+#        print(f'Epoch: {epoch:02d}, Loss: {loss:.4f}, Train: {accs[0]:.4f}, '
+#              f'Val: {accs[1]:.4f}, Test: {accs[2]:.4f}')
