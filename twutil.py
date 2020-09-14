@@ -11,11 +11,12 @@ class RetweetDataset(InMemoryDataset):
 
     @property
     def raw_file_names(self):
-        return ['some_file_1', 'some_file_2']
+        return ['china_052020_tweets_csv_hashed.csv',
+                'china_052020_users_csv_hashed.csv']
 
     @property
     def processed_file_names(self):
-        return ['t.pt']
+        return ['rt.pt']
 
     def download(self):
         # Download to `self.raw_dir`.
@@ -90,7 +91,8 @@ class RetweetDataset(InMemoryDataset):
         # retweet_userid from data, which can be empty. Do the assignment
         # only if is a retweet.
         tdf['retweet_userid'] = np.where(tdf.is_retweet == True,
-                                         tdf.tweet_text.str.split(expand=True)[1],
+                                         tdf.tweet_text.str.\
+                                         split(expand=True)[1],
                                          '')
         # remove @ in RT
         tdf['retweet_userid'] = tdf['retweet_userid'].str.replace("@","")
@@ -108,14 +110,12 @@ class RetweetDataset(InMemoryDataset):
             'is_retweet',
             'retweet_userid'
         ]
-        #retweets = (retweets.loc[retweets['is_retweet'] == True]) \
-            #    .groupby(rt_cols, as_index=False).size()
         retweets = retweets.groupby(rt_cols, as_index=False).size()
 
-        # node index is user index. get list of users from full tdf dataset since
-        # user can retweet a user that doesn't retweet.
-
-        # id_u: node id to userid by finding unique userid & unique retweet_userid
+        # node index is user index. get list of users from full tdf dataset
+        # since user can retweet a user that doesn't retweet.
+        # id_u: node id to userid by finding unique userid and
+        # unique retweet_userid
         id_u = list(pd.unique(tdf[['userid','retweet_userid']].\
                               values.ravel('K')))
         #  append users from udf, use set and list to get unique hashes
@@ -142,26 +142,33 @@ class RetweetDataset(InMemoryDataset):
         # add features
         n_feat = len(read_user_cols) - 1
         X = torch.zeros((num_nodes, n_feat))
-        y = torch.zeros(num_nodes)
+        n_classes = 2
+        y = torch.randint(0, 3, (num_nodes,))
 
         for index, row in udf.iterrows():
             node_idx = u_id[row['userid']]
             X[node_idx,0] = row['follower_count']
             X[node_idx,1] = row['following_count']
-            X[node_idx,2] = datetime.fromisoformat(row['account_creation_date']).\
-                timestamp()/1.0e9
+            X[node_idx,2] = datetime.\
+                fromisoformat(row['account_creation_date']).timestamp()/1.0e9
             l = row['account_language']
             s = 0
             for c in l:
                 s += ord(c)
             X[node_idx,3] = s
 
-        #    data = Data(x=X,edge_index=edge_index, edge_attr=edge_adj, y=y)
+        d = Data(x=X,edge_index=edge_index, edge_attr=edge_adj, y=y)
 
-        d = [Data(x=X,edge_index=edge_index)]
+        # test, train, val masks
+        dist = np.random.rand(num_nodes)
+        t = 0.6 # training  0.0 < t < t+v < 1.0
+        v = 0.2 # val
+        d.train_mask = torch.from_numpy((dist<t))
+        d.test_mask = torch.from_numpy((t<dist)&(dist<t+v))
+        d.val_mask = torch.from_numpy((t+v<dist))
 
         # Read data into huge `Data` list.
-        data_list = d
+        data_list = [d]
 
         if self.pre_filter is not None:
             data_list = [data for data in data_list if self.pre_filter(data)]
