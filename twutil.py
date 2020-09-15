@@ -25,7 +25,7 @@ class RetweetDataset(InMemoryDataset):
 
     def process(self):
 
-        def read_tweets(countries):
+        def read_tweets(states):
             # select columns of interest
             read_tweet_cols=[
                 #'tweetid',
@@ -63,8 +63,9 @@ class RetweetDataset(InMemoryDataset):
             li = []
             for s in states:
                 base = s + '_052020'
-                path = '/DATA/SDH/twitter/election-integrity' + '/' + base
-                f = path + '/' +  base +  "_tweets_csv_hashed.csv"
+                p = '/DATA/SDH/twitter/election-integrity' + '/' + base
+                #f = p + '/' +  base +  "_tweets_csv_hashed.csv"
+                f = p + '/' +  base +  "_tweets_csv_hashed_ge_2018-01-01.csv"
                 print('reading: ' + f)
                 # tweet dataframe
                 df = pd.read_csv(f, usecols=read_tweet_cols)
@@ -88,8 +89,8 @@ class RetweetDataset(InMemoryDataset):
             li = []
             for s in states:
                 base = s + '_052020'
-                path = '/DATA/SDH/twitter/election-integrity' + '/' + base
-                f = path + '/' +  base +  "_users_csv_hashed.csv"
+                p = '/DATA/SDH/twitter/election-integrity' + '/' + base
+                f = p + '/' +  base +  "_users_csv_hashed.csv"
                 print('reading: ' + f)
                 # tweet dataframe
                 df = pd.read_csv(f, usecols=read_user_cols)
@@ -102,8 +103,9 @@ class RetweetDataset(InMemoryDataset):
         # turkey:  9,511 users, 120,253,807 tweets
         #states = ['china']
         #states = ['russia']
-        #states = ['turkey']
-        states = ['china','russia']
+        states = ['turkey']
+        #states = ['china','russia']
+        #states = ['china','russia','turkey']
         tdf = read_tweets(states)
 
         # users dataframe
@@ -142,9 +144,11 @@ class RetweetDataset(InMemoryDataset):
         # unique retweet_userid
         id_u = list(pd.unique(tdf[['userid','retweet_userid']].\
                               values.ravel('K')))
+        print(len(id_u))
         #  append users from udf, use set and list to get unique hashes
         id_u = list(set(np.append(id_u, list(pd.unique(udf['userid'])))))
         num_nodes = len(id_u)
+        print(num_nodes)
 
         # u_id: dict k=userid, v=node id
         u_id = {k: v for v, k in enumerate(id_u)}
