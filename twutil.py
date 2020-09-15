@@ -100,7 +100,10 @@ class RetweetDataset(InMemoryDataset):
         # china:  23,787 users,     427,903 tweets
         # russia:  1,205 users,   4,373,218 tweets
         # turkey:  9,511 users, 120,253,807 tweets
-        states = ['china', 'russia']
+        #states = ['china']
+        #states = ['russia']
+        #states = ['turkey']
+        states = ['china','russia']
         tdf = read_tweets(states)
 
         # users dataframe
@@ -163,7 +166,7 @@ class RetweetDataset(InMemoryDataset):
         # add features
         n_feat = len(udf.columns) - 1
         X = torch.zeros((num_nodes, n_feat))
-        y = torch.zeros((num_nodes),dtype=torch.int_)
+        y = torch.zeros((num_nodes),dtype=torch.long)
 
         sv = {k: v for v, k in enumerate(states)}
         for index, row in udf.iterrows():
