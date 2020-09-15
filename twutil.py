@@ -40,14 +40,14 @@ class RetweetDataset(InMemoryDataset):
                 #'account_creation_date',
                 #'account_language',
                 #'tweet_language',
-                'tweet_text',
+#                'tweet_text',
                 #'tweet_time',
                 #'tweet_client_name',
                 #'in_reply_to_userid',
                 #'in_reply_to_tweetid',
                 #'quoted_tweet_tweetid',
-                'is_retweet'
-                #'retweet_userid',
+                'is_retweet',
+                'retweet_userid'
                 #'retweet_tweetid',
                 #'latitude',
                 #'longitude',
@@ -59,7 +59,7 @@ class RetweetDataset(InMemoryDataset):
                 #'urls',
                 #'user_mentions'
             ]
-
+            t = {'userid': str, 'is_retweet': bool, 'retweet_userid': str}
             li = []
             for s in states:
                 base = s + '_052020'
@@ -68,7 +68,7 @@ class RetweetDataset(InMemoryDataset):
                 f = p + '/' +  base +  "_tweets_csv_hashed_ge_2018-01-01.csv"
                 print('reading: ' + f)
                 # tweet dataframe
-                df = pd.read_csv(f, usecols=read_tweet_cols)
+                df = pd.read_csv(f, usecols=read_tweet_cols, dtype=t)
                 df['state'] = s
                 li.append(df)
             return pd.concat(li, axis=0, ignore_index=True)
@@ -86,6 +86,7 @@ class RetweetDataset(InMemoryDataset):
                 'account_creation_date',
                 'account_language'
             ]
+            t = {'userid': str}
             li = []
             for s in states:
                 base = s + '_052020'
@@ -93,7 +94,7 @@ class RetweetDataset(InMemoryDataset):
                 f = p + '/' +  base +  "_users_csv_hashed.csv"
                 print('reading: ' + f)
                 # tweet dataframe
-                df = pd.read_csv(f, usecols=read_user_cols)
+                df = pd.read_csv(f, usecols=read_user_cols, dtype=t)
                 df['state'] = s
                 li.append(df)
             return pd.concat(li, axis=0, ignore_index=True)
@@ -103,31 +104,16 @@ class RetweetDataset(InMemoryDataset):
         # turkey:  9,511 users, 120,253,807 tweets
         #states = ['china']
         #states = ['russia']
-        states = ['turkey']
+        #states = ['turkey']
         #states = ['china','russia']
-        #states = ['china','russia','turkey']
+        states = ['china','russia','turkey']
+        # tweet dataframe
         tdf = read_tweets(states)
 
         # users dataframe
         udf = read_users(states)
 
-        # tweets
-
-        # add retweet_userid by taking [1] from tweet_text instead of using
-        # retweet_userid from data, which can be empty. Do the assignment
-        # only if is a retweet.
-        tdf['retweet_userid'] = np.where(tdf.is_retweet == True,
-                                         tdf.tweet_text.str.\
-                                         split(expand=True)[1],
-                                         '')
-        # remove @ in RT
-        tdf['retweet_userid'] = tdf['retweet_userid'].str.replace("@","")
-        # remove trailing : in RT
-        tdf['retweet_userid'] = tdf['retweet_userid'].str.replace(":","")
-
         # retweets
-
-        # get retweets
         retweets = tdf.loc[tdf['is_retweet'] == True]
 
         # pick out unique retweets
@@ -136,19 +122,13 @@ class RetweetDataset(InMemoryDataset):
             'is_retweet',
             'retweet_userid'
         ]
+        # add number of instances
         retweets = retweets.groupby(rt_cols, as_index=False).size()
 
-        # node index is user index. get list of users from full tdf dataset
-        # since user can retweet a user that doesn't retweet.
-        # id_u: node id to userid by finding unique userid and
-        # unique retweet_userid
-        id_u = list(pd.unique(tdf[['userid','retweet_userid']].\
-                              values.ravel('K')))
-        print(len(id_u))
-        #  append users from udf, use set and list to get unique hashes
-        id_u = list(set(np.append(id_u, list(pd.unique(udf['userid'])))))
+        # node index is user index. get list of users from udf. Retweets
+        # of users not in udf are not in the graph.
+        id_u = list(pd.unique(udf['userid']))
         num_nodes = len(id_u)
-        print(num_nodes)
 
         # u_id: dict k=userid, v=node id
         u_id = {k: v for v, k in enumerate(id_u)}
@@ -158,10 +138,13 @@ class RetweetDataset(InMemoryDataset):
         c = np.zeros(len(retweets), dtype=np.int_)
         d = np.zeros(len(retweets), dtype=np.int_)
 
+        # go through all retweets
         for index, row in retweets.iterrows():
-            r[index] = u_id[row['userid']]
-            c[index] = u_id[row['retweet_userid']]
-            d[index] = row['size']
+            # add edges when userid and retweet_userid exist
+            if row['retweet_userid'] != '':
+                r[index] = u_id[row['userid']]
+                c[index] = u_id[row['retweet_userid']]
+                d[index] = row['size']
 
         # make edges
         edge_index = torch.from_numpy(np.transpose(np.column_stack((r,c))))
@@ -171,6 +154,14 @@ class RetweetDataset(InMemoryDataset):
         n_feat = len(udf.columns) - 1
         X = torch.zeros((num_nodes, n_feat))
         y = torch.zeros((num_nodes),dtype=torch.long)
+
+        # other feature vectors from tweets
+        # number of tweets
+        # number of retweets
+        # number of quotes (per tweet)
+        # number of replies (per tweet)
+        # number of likes (per tweet)
+        # bag of words for tweet text
 
         sv = {k: v for v, k in enumerate(states)}
         for index, row in udf.iterrows():
