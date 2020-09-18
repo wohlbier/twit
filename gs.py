@@ -85,7 +85,7 @@ if __name__ == "__main__":
     loader = GraphSAINTRandomWalkSampler(data, batch_size=6000, walk_length=2,
                                          num_steps=5, sample_coverage=100,
                                          save_dir='./processed',
-                                         num_workers=0)
+                                         num_workers=1)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net(hidden_channels=256).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)

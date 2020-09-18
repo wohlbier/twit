@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch_geometric.data import Data, InMemoryDataset
+from torch_geometric.utils import degree
 
 class RetweetDataset(InMemoryDataset):
     def __init__(self, root, transform=None, pre_transform=None):
@@ -40,7 +41,7 @@ class RetweetDataset(InMemoryDataset):
                 #'account_creation_date',
                 #'account_language',
                 #'tweet_language',
-#                'tweet_text',
+                #'tweet_text',
                 #'tweet_time',
                 #'tweet_client_name',
                 #'in_reply_to_userid',
@@ -64,8 +65,9 @@ class RetweetDataset(InMemoryDataset):
             for s in states:
                 base = s + '_052020'
                 p = '/DATA/SDH/twitter/election-integrity' + '/' + base
-                #f = p + '/' +  base +  "_tweets_csv_hashed.csv"
-                f = p + '/' +  base +  "_tweets_csv_hashed_ge_2018-01-01.csv"
+                f = p + '/' +  base +  "_tweets_csv_hashed.csv"
+                #f = p + '/' +  base +  "_tweets_csv_hashed_ge_2016-01-01.csv"
+                #f = p + '/' +  base +  "_tweets_csv_hashed_ge_2018-01-01.csv"
                 print('reading: ' + f)
                 # tweet dataframe
                 df = pd.read_csv(f, usecols=read_tweet_cols, dtype=t)
@@ -113,8 +115,9 @@ class RetweetDataset(InMemoryDataset):
         # users dataframe
         udf = read_users(states)
 
-        # retweets
-        retweets = tdf.loc[tdf['is_retweet'] == True]
+        # retweets. remove rows where retweet_userid == ''
+        retweets = tdf.loc[((tdf['is_retweet'] == True)
+                            & (tdf['retweet_userid'] != ''))]
 
         # pick out unique retweets
         rt_cols = [
@@ -138,13 +141,13 @@ class RetweetDataset(InMemoryDataset):
         c = np.zeros(len(retweets), dtype=np.int_)
         d = np.zeros(len(retweets), dtype=np.int_)
 
+        print("Number of retweets: " + str(len(retweets)))
+        print("Number of users:    " + str(num_nodes))
         # go through all retweets
         for index, row in retweets.iterrows():
-            # add edges when userid and retweet_userid exist
-            if row['retweet_userid'] != '':
-                r[index] = u_id[row['userid']]
-                c[index] = u_id[row['retweet_userid']]
-                d[index] = row['size']
+            r[index] = u_id[row['userid']]
+            c[index] = u_id[row['retweet_userid']]
+            d[index] = row['size']
 
         # make edges
         edge_index = torch.from_numpy(np.transpose(np.column_stack((r,c))))
@@ -177,7 +180,8 @@ class RetweetDataset(InMemoryDataset):
                 s += ord(c)
             X[node_idx,3] = s
 
-        d = Data(x=X,edge_index=edge_index, edge_attr=edge_adj, y=y)
+        d = Data(x=X, edge_index=edge_index, edge_attr=edge_adj, y=y)
+        d.num_nodes = num_nodes
 
         # test, train, val masks
         dist = np.random.rand(num_nodes)

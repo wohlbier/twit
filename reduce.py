@@ -61,4 +61,4 @@ if __name__ == "__main__":
     # turkey:  9,511 users, 120,253,807 tweets
     states = ['china', 'russia', 'turkey']
     for s in states:
-        reduce_tweets(s, "2018-01-01")
+        reduce_tweets(s, "2016-01-01")

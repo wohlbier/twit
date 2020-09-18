@@ -1,0 +1,95 @@
+
+
+GraphSAINT
+Epoch: 957, Loss: 6.8465, Train: 0.9151, Val: 0.9171, Test: 0.9184
+Epoch: 958, Loss: 1.9490, Train: 0.9146, Val: 0.9173, Test: 0.9187
+Epoch: 959, Loss: 5.0902, Train: 0.8756, Val: 0.8765, Test: 0.8786
+Epoch: 960, Loss: 2.0834, Train: 0.9111, Val: 0.9120, Test: 0.9147
+Epoch: 961, Loss: 1.2642, Train: 0.9095, Val: 0.9104, Test: 0.9129
+Epoch: 962, Loss: 1.6789, Train: 0.9127, Val: 0.9190, Test: 0.9191
+Epoch: 963, Loss: 3.0859, Train: 0.8709, Val: 0.8724, Test: 0.8766
+Epoch: 964, Loss: 1.7274, Train: 0.9123, Val: 0.9137, Test: 0.9155
+Epoch: 965, Loss: 2.3193, Train: 0.8802, Val: 0.8785, Test: 0.8786
+Epoch: 966, Loss: 3.8987, Train: 0.9092, Val: 0.9103, Test: 0.9149
+Epoch: 967, Loss: 2.0720, Train: 0.9143, Val: 0.9151, Test: 0.9172
+Epoch: 968, Loss: 1.9247, Train: 0.9132, Val: 0.9164, Test: 0.9166
+Epoch: 969, Loss: 2.4352, Train: 0.9165, Val: 0.9192, Test: 0.9202
+Epoch: 970, Loss: 3.2086, Train: 0.9124, Val: 0.9146, Test: 0.9161
+Epoch: 971, Loss: 7.7236, Train: 0.9030, Val: 0.9034, Test: 0.9060
+Epoch: 972, Loss: 2.3813, Train: 0.9152, Val: 0.9190, Test: 0.9204
+Epoch: 973, Loss: 3.9357, Train: 0.9042, Val: 0.9022, Test: 0.9088
+Epoch: 974, Loss: 2.1359, Train: 0.8894, Val: 0.8913, Test: 0.8929
+Epoch: 975, Loss: 1.9096, Train: 0.9125, Val: 0.9164, Test: 0.9170
+Epoch: 976, Loss: 1.4504, Train: 0.9136, Val: 0.9165, Test: 0.9181
+Epoch: 977, Loss: 1.1465, Train: 0.9167, Val: 0.9195, Test: 0.9198
+Epoch: 978, Loss: 1.6100, Train: 0.9143, Val: 0.9167, Test: 0.9166
+Epoch: 979, Loss: 2.9199, Train: 0.8967, Val: 0.9017, Test: 0.8998
+Epoch: 980, Loss: 1.7228, Train: 0.9142, Val: 0.9178, Test: 0.9198
+Epoch: 981, Loss: 1.6060, Train: 0.9143, Val: 0.9171, Test: 0.9184
+Epoch: 982, Loss: 1.1946, Train: 0.9092, Val: 0.9125, Test: 0.9126
+Epoch: 983, Loss: 1.1665, Train: 0.9090, Val: 0.9109, Test: 0.9124
+Epoch: 984, Loss: 1.1643, Train: 0.9002, Val: 0.9028, Test: 0.9014
+Epoch: 985, Loss: 1.0829, Train: 0.9069, Val: 0.9095, Test: 0.9108
+Epoch: 986, Loss: 1.2113, Train: 0.9139, Val: 0.9168, Test: 0.9169
+Epoch: 987, Loss: 1.4337, Train: 0.9162, Val: 0.9204, Test: 0.9210
+Epoch: 988, Loss: 1.9443, Train: 0.8992, Val: 0.9022, Test: 0.8990
+Epoch: 989, Loss: 1.0499, Train: 0.9160, Val: 0.9201, Test: 0.9201
+Epoch: 990, Loss: 1.8268, Train: 0.9146, Val: 0.9167, Test: 0.9169
+Epoch: 991, Loss: 1.1182, Train: 0.9162, Val: 0.9193, Test: 0.9204
+Epoch: 992, Loss: 1.6252, Train: 0.9155, Val: 0.9188, Test: 0.9187
+Epoch: 993, Loss: 1.8489, Train: 0.9151, Val: 0.9195, Test: 0.9207
+Epoch: 994, Loss: 1.9914, Train: 0.8818, Val: 0.8868, Test: 0.8848
+Epoch: 995, Loss: 0.7402, Train: 0.9095, Val: 0.9146, Test: 0.9124
+Epoch: 996, Loss: 1.4112, Train: 0.9113, Val: 0.9143, Test: 0.9153
+Epoch: 997, Loss: 1.8577, Train: 0.9147, Val: 0.9171, Test: 0.9188
+Epoch: 998, Loss: 0.9745, Train: 0.9099, Val: 0.9139, Test: 0.9123
+Epoch: 999, Loss: 1.0146, Train: 0.9163, Val: 0.9198, Test: 0.9199
+
+real    117m4.365s
+user    542m1.133s
+sys     244m23.150s
+
+
+
+
+Reddit clustering
+Epoch: 01, Loss: 1.1813
+Epoch: 02, Loss: 0.4753
+Epoch: 03, Loss: 0.3962
+Epoch: 04, Loss: 0.3586
+Evaluating: 100%|██████████████████████| 465930/465930 [16:58<00:00, 457.53it/s]
+Epoch: 05, Loss: 0.3353, Train: 0.9539, Val: 0.9501, test: 0.9499
+Epoch: 06, Loss: 0.3180
+Epoch: 07, Loss: 0.3001
+Epoch: 08, Loss: 0.3113
+Epoch: 09, Loss: 0.2898
+Evaluating: 100%|██████████████████████| 465930/465930 [15:38<00:00, 496.33it/s]
+Epoch: 10, Loss: 0.2994, Train: 0.9566, Val: 0.9482, test: 0.9479
+Epoch: 11, Loss: 0.2864
+Epoch: 12, Loss: 0.2734
+Epoch: 13, Loss: 0.2755
+Epoch: 14, Loss: 0.2754
+Evaluating: 100%|██████████████████████| 465930/465930 [14:59<00:00, 518.24it/s]
+Epoch: 15, Loss: 0.2628, Train: 0.9652, Val: 0.9527, test: 0.9519
+Epoch: 16, Loss: 0.2739
+Epoch: 17, Loss: 0.2923
+Epoch: 18, Loss: 0.2612
+Epoch: 19, Loss: 0.2466
+Evaluating: 100%|██████████████████████| 465930/465930 [14:21<00:00, 541.13it/s]
+Epoch: 20, Loss: 0.2443, Train: 0.9642, Val: 0.9507, test: 0.9495
+Epoch: 21, Loss: 0.2426
+Epoch: 22, Loss: 0.2381
+Epoch: 23, Loss: 0.2435
+Epoch: 24, Loss: 0.2446
+Evaluating: 100%|██████████████████████| 465930/465930 [14:44<00:00, 526.84it/s]
+Epoch: 25, Loss: 0.2459, Train: 0.9665, Val: 0.9504, test: 0.9505
+Epoch: 26, Loss: 0.2462
+Epoch: 27, Loss: 0.2323
+Epoch: 28, Loss: 0.2402
+Epoch: 29, Loss: 0.2505
+Evaluating: 100%|██████████████████████| 465930/465930 [14:38<00:00, 530.54it/s]
+Epoch: 30, Loss: 0.2390, Train: 0.9692, Val: 0.9514, test: 0.9516
+
+real    165m29.175s
+user    321m43.896s
+sys     194m18.041s
