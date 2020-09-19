@@ -104,9 +104,9 @@ if __name__ == "__main__":
     model = Net(dataset.num_features, dataset.num_classes).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
-    for epoch in range(1, 101):
+    for epoch in range(1, 10001):
         loss = train()
-        if epoch % 5 == 0:
+        if epoch % 20 == 0:
             train_acc, val_acc, test_acc = test()
             print(f'Epoch: {epoch:02d}, Loss: {loss:.4f}, '
                   f'Train: {train_acc:.4f}, '

@@ -186,8 +186,8 @@ class RetweetDataset(InMemoryDataset):
 
         # test, train, val masks
         dist = np.random.rand(num_nodes)
-        t = 0.6 # training  0.0 < t < t+v < 1.0
-        v = 0.2 # val
+        t = 0.8 # training  0.0 < t < t+v < 1.0
+        v = 0.1 # val
         d.train_mask = torch.from_numpy((dist<t))
         d.test_mask = torch.from_numpy((t<dist)&(dist<t+v))
         d.val_mask = torch.from_numpy((t+v<dist))
