@@ -154,7 +154,8 @@ class RetweetDataset(InMemoryDataset):
         edge_adj = torch.from_numpy(d)
 
         # add features
-        n_feat = len(udf.columns) - 1
+        n_feat = len(udf.columns) - 2 # 'userid', 'state'
+        print('n_feat: ' + str(n_feat))
         X = torch.zeros((num_nodes, n_feat))
         y = torch.zeros((num_nodes),dtype=torch.long)
 

@@ -42,8 +42,6 @@ class Net(torch.nn.Module):
                     x = F.relu(x)
                 xs.append(x.cpu())
 
-                print(batch_size)
-                print(n_id)
                 pbar.update(batch_size)
 
             x_all = torch.cat(xs, dim=0)
@@ -76,37 +74,35 @@ def test():  # Inference should be performed on the full graph.
 
     out = model.inference(data.x)
     y_pred = out.argmax(dim=-1)
-    print(out)
-    print(len(out))
-    print(y_pred)
-    print(len(y_pred))
 
     accs = []
-#    for mask in [data.train_mask, data.val_mask, data.test_mask]:
-#        correct = y_pred[mask].eq(data.y[mask]).sum().item()
-#        accs.append(correct / mask.sum().item())
+    for mask in [data.train_mask, data.val_mask, data.test_mask]:
+        correct = y_pred[mask].eq(data.y[mask]).sum().item()
+        accs.append(correct / mask.sum().item())
     return accs
 
 if __name__ == "__main__":
     dataset = RetweetDataset(root='./')
-    print('num_classes: ' + str(dataset.num_classes))
     data = dataset[0]
 
-    print(len(data.train_mask))
-    print(dataset.num_features)
+    print('num_classes: ' + str(dataset.num_classes))
+    print('num_nodes: ' + str(data.num_nodes))
+    print('num_features: ' + str(dataset.num_features))
 
     cluster_data = ClusterData(data, num_parts=1, recursive=False,
                                save_dir=dataset.processed_dir)
-    train_loader = ClusterLoader(cluster_data, batch_size=20, shuffle=True,
-                                 num_workers=1)
+
+    train_loader = ClusterLoader(cluster_data, batch_size=16, shuffle=True,
+                                 num_workers=0)
 
     subgraph_loader = NeighborSampler(data.edge_index, sizes=[-1],
-                                      batch_size=512, shuffle=False,
-                                      num_workers=1)
+                                      num_nodes=data.num_nodes,
+                                      batch_size=16, shuffle=False,
+                                      num_workers=0)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net(dataset.num_features, dataset.num_classes).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     for epoch in range(1, 31):
         loss = train()
