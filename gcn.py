@@ -102,9 +102,9 @@ if __name__ == "__main__":
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net(dataset.num_features, dataset.num_classes).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
-    for epoch in range(1, 31):
+    for epoch in range(1, 101):
         loss = train()
         if epoch % 5 == 0:
             train_acc, val_acc, test_acc = test()
