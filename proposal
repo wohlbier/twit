@@ -1,6 +1,192 @@
+===============================================================================
+Title
+-------------------------------------------------------------------------------
+Identifying Actor Characteristics in State-Linked Twitter Information
+Operations Data Using Graph Based Neural Networks
+===============================================================================
+Keywords (at least three)
+-------------------------------------------------------------------------------
+Graph neural networks,
+GraphSAINT,
+GraphSAGE,
+Twitter,
+Information operations
+===============================================================================
+About your team. * Please, describe your research group and its availability
+to work collaboratively with the Neocortex team during the 30-day Early User
+Program (EUP). Please, include who would be the main point of contact for this
+collaboration (name, email address).
+-------------------------------------------------------------------------------
+
+Point of contact: Dr. John G. Wohlbier, jgwohlbier@sei.cmu.edu
+
+The Advanced Computing group in the Carnegie Mellon University, Software
+Engineering Institute (SEI), Emerging Technology Center has extensive
+experience at the intersection of data intensive AI/ML computing and new and
+emerging hardware. The team serves as trusted government advisors for the DARPA
+Software Defined Hardware (SDH) and Domain Specific System on Chip (DSSoC)
+programs. Team members understand and can exploit very low level performance
+characteristics, such as those that will be required to have success on
+Neocortex.
+
+https://www.linkedin.com/in/john-wohlbier-52a6b5a1/
+Wohlbier is a Senior Research Scientist at the SEI. He has over 15 years of
+experience in HPC and is the technical lead for the SEI's support to DARPA
+SDH and DSSoC.
+
+https://www.linkedin.com/in/scott-m-3785751/
+Dr. Scott McMillan is a Principal Member of the Research Staff at the SEI.
+He has over two decades of experience in HPC, and is an active member of the
+GraphBLAS API specification committee.
+
+https://www.linkedin.com/in/annika-horgan-40b935162/
+Horgan is an Associate Software Developer at the SEI. She has considerable
+experience working with schedulers for advanced hardware, and provides
+data analytics expertise.
+
+The team will be available to work with the Neocortex team during the EUP.
+Wohlbier has an existing working relationship with Dr. Natalia Vassilieva
+at Cerebras.
+
+===============================================================================
+About your research. * Please, provide a concise description of your ML/AI
+use case, its scientific motivation, and impact. What do you hope to
+accomplish during the 30-day EUP? See the Neocortex EUP webpage for examples
+(https://www.cmu.edu/psc/aibd/neocortex/early-user-program.html).
+-------------------------------------------------------------------------------
+Since 2018 Twitter has been releasing data comprised of tweets and user
+profiles from accounts identified as being associated with state-backed
+information operations
+[https://transparency.twitter.com/en/reports/information-operations.html].
+The data is released to the public in hopes that the research community can
+use it to "build the necessary societal defenses and capacities to protect
+public conversation." Graph Neural Networks (GNNs) have proven powerful in
+recent years in combining AI/ML techniques applied to node attributes with
+underlying graph structure to perform node classification, link prediction,
+and community detection. We will study actor characteristics using a
+myriad of GNNs as applied too retweet graphs assembled from twitter data.
+We have assembled a collection of models using some of the most popular
+GNNs and applied it to the June 2020 data release which includes over
+32,000 users, 160,000 retweets, and 120,000,000 tweets. We will use Neocortex
+to apply our models to all of the existing Twitter information operations
+datasets, and expect to run the models in a timely manner. Our models include
+both those that require multiple instances of the graph adjacency matrix
+resident in memory, such as Scalable Inception Graph Neural Networks (SIGN),
+as well as those that follow a graph sampling paradigm, such as
+GraphSAGE and GraphSAINT.
+
+===============================================================================
+Related publications. * Please, list any recent publications that motivate or
+describe the work you plan to execute on Neocortex.
+-------------------------------------------------------------------------------
+Data:
+https://transparency.twitter.com/en/reports/information-operations.html
+
+Graph Neural Networks:
+
+SIGN
+Rossi, E., Frasca, F., Chamberlain, B., Eynard, D., Bronstein, M., & Monti, F. (2020). SIGN: Scalable Inception Graph Neural Networks. arXiv preprint arXiv:2004.11198.
+https://arxiv.org/pdf/2004.11198
+
+GraphSAGE
+Hamilton, W., Ying, Z., & Leskovec, J. (2017). Inductive representation learning on large graphs. In Advances in neural information processing systems (pp. 1024-1034).
+https://papers.nips.cc/paper/6703-inductive-representation-learning-on-large-graphs.pdf
+
+GraphSAINT
+Zeng, H., Zhou, H., Srivastava, A., Kannan, R., & Prasanna, V. (2019). Graphsaint: Graph sampling based inductive learning method. arXiv preprint arXiv:1907.04931.
+https://arxiv.org/pdf/1907.04931
+
+===============================================================================
+About your ML model. * Please, provide a technical description of your neural
+network architecture and optimization algorithm. If you are using a published
+model+algorithm, please indicate the model, citation, and repo (if available).
+If not a published one, then list the #parameters, #layers, layer types,
+numerical precision, etc. If possible, please provide a reference to a known
+proxy/representative model, code (e.g. TensorFlow code), or repo link
+(e.g. Github).
+-------------------------------------------------------------------------------
+The primary models we will use are SIGN, GraphSAGE, and GraphSAINT, as
+mentioned above. Our work to date has been implemented using Pytorch
+Geometric https://github.com/rusty1s/pytorch_geometric. Our implementations
+are available at https://github.com/wohlbier/twit, which includes code for
+raw data processing and feature extraction.
+
+The number of layers and
+parameters depends on the GNN. Typical GNNs have only two or three layers,
+which can be confirmed in our code. The way GNNs exploit graph structure is
+through a single or multi-hop neighbor aggregation mechanism. Sampling based
+GNNs such as GraphSAGE and GraphSAINT use randomly sampled subsets of
+neighbors, and neighbors of neighbors, to avoid oftentimes exponential
+explosion of attribute aggregation. It is suspected that inclusion of
+additional neighbors during sampling can improve model fidelity, but most
+often it is not done for reasons of computational cost. On Neocortex we will
+study how large we can make neighbor samples, and the impact it has on
+fidelity and run time.
+
+The SIGN architecture is formulated such that it
+can grow rapidly with a modest increase in the number of parameters, while
+implementations appearing in the literature use a small number of parameters.
+For example, in the inception like formulation the parameter $r$ appears
+as an exponent on the adjacency matrix. An adjacency matrix raised to several
+powers will quickly become dense and multiple copies of the dense
+adjacency matrix would need to be stored in memory. On Neocortex we will
+explore the practical limits of the SIGN architecture and how model
+fidelity will benefit from increasing parameters.
+
+===============================================================================
+About your data. * Please, describe your data by indicating type (images,
+video, sensor, text, etc), dimensions of a single training sample (e.g. image
+dimensions and number of channels for images, sequence length for sequence
+data), and dataset volume (number of training samples, volume in MBs/GBs/TBs).
+Please indicate if your data requires time-consuming preprocessing and mention
+any other consideration(s) you consider relevant.
+-------------------------------------------------------------------------------
+Our data consists of user information and tweets released by Twitter over the
+course of two years, as described here.
+https://transparency.twitter.com/en/reports/information-operations.html
+The releases contain users, tweets, and the media associated with the tweets
+stored in ASCII csv files.
+Both user and tweet data include metadata used to build features and to
+construct graphs. For the purposes of this work we will focus only on the
+user and tweet data, and not use the media data. The most recent data
+release included:
+China: 23,750 accounts,     427,903 tweets
+Russia: 1,152 accounts,   4,373,218 tweets
+Turkey: 7,340 accounts, 120,253,807 tweets
+We constructed a retweet graph from the combined data and it results in
+161,076 edges. This is a directed graph as users need not retweet each other.
+While this graph is of a modest size, it is expected to grow significantly
+when we include data from all previous releases. Moreover, it is expected
+that information operations are accelerating, and that Twitter will continue to
+release new data every few months. For details of the sizes on past data
+releases see https://github.com/wohlbier/twit/blob/master/README.md.
+
+Because we are excluding the media files, data volumes are modest and do
+not add up to much more than tens of gigabytes. In future work if we were
+to include media into our models then data volumes would quickly rised to
+tens of terabytes.
+
+Extracting features from the data can take considerable time, but we expect
+to have most of the fetaure extraction work done ahead of time.
+
+===============================================================================
+Performance. * Please, share the training or inference performance you are
+currently seeing. What infrastructure are you using now (e.g. # GPU nodes and
+type; on-premise or cloud)? Have you scaled your model to multiple GPUs,
+processors, and/or nodes? What are the limitations or bottlenecks you would
+like to address with Neocortex, and is there a specific level of performance
+you would like to achieve?
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
 - GraphSAGE - would like to test K > 2 which becomes prohibitively expensive
-
-
 
 
 GraphSAINT
