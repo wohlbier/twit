@@ -48,14 +48,14 @@ class RetweetDataset(InMemoryDataset):
                 #'in_reply_to_tweetid',
                 #'quoted_tweet_tweetid',
                 'is_retweet',
-                'retweet_userid'
+                'retweet_userid',
                 #'retweet_tweetid',
                 #'latitude',
                 #'longitude',
-                #'quote_count',
-                #'reply_count',
-                #'like_count',
-                #'retweet_count',
+                'quote_count',
+                'reply_count',
+                'like_count',
+                'retweet_count'
                 #'hashtags',
                 #'urls',
                 #'user_mentions'
@@ -155,31 +155,52 @@ class RetweetDataset(InMemoryDataset):
 
         # add features
         n_feat = len(udf.columns) - 2 # 'userid', 'state'
-        print('n_feat: ' + str(n_feat))
-        X = torch.zeros((num_nodes, n_feat))
-        y = torch.zeros((num_nodes),dtype=torch.long)
 
         # other feature vectors from tweets
         # number of tweets
+        n_feat += 1
         # number of retweets
-        # number of quotes (per tweet)
-        # number of replies (per tweet)
-        # number of likes (per tweet)
+        n_feat += 1
+        # number of quoted
+        n_feat += 1
+        # number of replied
+        n_feat += 1
+        # number of liked
+        n_feat += 1
+        # number of retweeted
+        n_feat += 1
         # bag of words for tweet text
+
+        print('n_feat: ' + str(n_feat))
+        X = torch.zeros((num_nodes, n_feat))
+        y = torch.zeros((num_nodes),dtype=torch.long)
 
         sv = {k: v for v, k in enumerate(states)}
         for index, row in udf.iterrows():
             node_idx = u_id[row['userid']]
             y[node_idx] = sv[row['state']]
+            # features
             X[node_idx,0] = row['follower_count']
             X[node_idx,1] = row['following_count']
             X[node_idx,2] = datetime.\
                 fromisoformat(row['account_creation_date']).timestamp()/1.0e9
-            l = row['account_language']
-            s = 0
-            for c in l:
-                s += ord(c)
-            X[node_idx,3] = s
+            X[node_idx,3] = sum([ord(c) for c in row['account_language']])
+
+            # get df for user tweets
+            utdf = tdf[tdf.userid == row['userid']]
+            # number of tweets
+            X[node_idx,4] = utdf.shape[0]
+            # number of retweets
+            X[node_idx,5] = sum(utdf['is_retweet'] == True)
+            # number of quoted
+            X[node_idx,6] = utdf['quote_count'].sum()
+            # number of replied
+            X[node_idx,7] = utdf['reply_count'].sum()
+            # number of liked
+            X[node_idx,8] = utdf['like_count'].sum()
+            # number of retweeted
+            X[node_idx,9] = utdf['retweet_count'].sum()
+
 
         d = Data(x=X, edge_index=edge_index, edge_attr=edge_adj, y=y)
         d.num_nodes = num_nodes
