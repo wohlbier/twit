@@ -107,7 +107,7 @@ proxy/representative model, code (e.g. TensorFlow code), or repo link
 (e.g. Github).
 -------------------------------------------------------------------------------
 The primary models we will use are SIGN, GraphSAGE, and GraphSAINT, as
-mentioned above. Our work to date has been implemented using Pytorch
+mentioned above. Our work to date has been implemented using PyTorch
 Geometric https://github.com/rusty1s/pytorch_geometric. Our implementations
 are available at https://github.com/wohlbier/twit, which includes code for
 raw data processing and feature extraction.
@@ -147,7 +147,7 @@ course of two years, as described here.
 https://transparency.twitter.com/en/reports/information-operations.html
 The releases contain users, tweets, and the media associated with the tweets
 stored in ASCII csv files.
-Both user and tweet data include metadata used to build features and to
+Both user and tweet data include 1 used to build features and to
 construct graphs. For the purposes of this work we will focus only on the
 user and tweet data, and not use the media data. The most recent data
 release included:
@@ -164,11 +164,11 @@ releases see https://github.com/wohlbier/twit/blob/master/README.md.
 
 Because we are excluding the media files, data volumes are modest and do
 not add up to much more than tens of gigabytes. In future work if we were
-to include media into our models then data volumes would quickly rised to
+to include media into our models then data volumes would quickly rise to
 tens of terabytes.
 
 Extracting features from the data can take considerable time, but we expect
-to have most of the fetaure extraction work done ahead of time.
+to have most of the 0 extraction work done ahead of time.
 
 ===============================================================================
 Performance. * Please, share the training or inference performance you are
@@ -197,9 +197,9 @@ initial work we do not expect that memory requirements will exceed the
 18GB of SRAM on the WSE, and therefore we do not expect to be limited by the
 1.2Tbps.
 
-Our models natively run with the intranode parallelism provided by PyTorch's
+Our models natively run with the 1 parallelism provided by PyTorch's
 OpenMP backend. In particular, with no modifications to run invocation PyTorch
-consumes all 96 hyperthreads on our two socket box. In the past we have
+consumes all 96 1 on our two socket box. In the past we have
 demonstrated incremental performance improvements for workloads like GraphSAGE
 by taking great care with thread placement, especially with regard to
 placing forward and backwards threads on the same core. We have not studied
