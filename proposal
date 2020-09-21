@@ -121,7 +121,7 @@ explosion of attribute aggregation. It is suspected that inclusion of
 additional neighbors during sampling can improve model fidelity, but most
 often it is not done for reasons of computational cost. On Neocortex we will
 study how large we can make neighbor samples, and the impact it has on
-fidelity and run time.
+fidelity and runtime.
 
 The SIGN architecture is formulated such that it
 can grow rapidly with a modest increase in the number of parameters, while
@@ -177,6 +177,33 @@ processors, and/or nodes? What are the limitations or bottlenecks you would
 like to address with Neocortex, and is there a specific level of performance
 you would like to achieve?
 -------------------------------------------------------------------------------
+With our current model parameters, training and inference for the models we
+plan to run on Neocortex can take up to several hours on an older model, high
+end dual socket Xeon Broadwell node. However, on Neocortex we plan to explore
+parameter spaces with deeper neighbor sampling that would cause CPU
+implementations to grind to a halt. The performance characteristics of GNNs
+are a mixture of sparse and dense operations. The fully connected
+layers of the neural network are dense, structured, single precisions floating
+point operations with predictable behavior. On conventional architectures
+the sparse operations typically dominate the runtime due to their unstructured
+memory access patterns. In particular, accesses to main memory cost hundreds
+of times more than floating point calculations, and walking neighbor lists
+essentially becomes pointer chasing. For this reason, neighbor intensive
+algorithms become memory latency bound on cache-based CPU systems. We expect
+that the high speed fabric on the Cerebras Wafer Scale Engine (WSE) will be
+extremely well suited for processing deep neighbor sampling on GNNs. For our
+initial work we do not expect that memory requirements will exceed the
+18GB of SRAM on the WSE, and therefore we do not expect to be limited by the
+1.2Tbps.
+
+Our models natively run with the intranode parallelism provided by PyTorch's
+OpenMP backend. In particular, with no modifications to run invocation PyTorch
+consumes all 96 hyperthreads on our two socket box. In the past we have
+demonstrated incremental performance improvements for workloads like GraphSAGE
+by taking great care with thread placement, especially with regard to
+placing forward and backwards threads on the same core. We have not studied
+this for our current workloads and expect that it will not be an issue for
+Neocortex.
 
 
 
