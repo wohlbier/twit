@@ -196,7 +196,7 @@ that the high speed fabric on the Cerebras Wafer Scale Engine (WSE) will be
 extremely well suited for processing deep neighbor sampling on GNNs. For our
 initial work we do not expect that memory requirements will exceed the
 18GB of SRAM on the WSE, and therefore we do not expect to be limited by the
-1.2Tbps.
+1.2Tbps ethernet links.
 
 Our models natively run with the intra-node parallelism provided by PyTorch's
 OpenMP backend. In particular, with no modifications to run invocation PyTorch
