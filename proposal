@@ -1,16 +1,17 @@
 ===============================================================================
 Title
 -------------------------------------------------------------------------------
-Identifying Actor Characteristics in State-Linked Twitter Information
-Operations Data Using Graph Based Neural Networks
+Identifying Actor Characteristics in State-Linked Information
+Operations Using Twitter Data and Graph Based Neural Networks
 ===============================================================================
 Keywords (at least three)
 -------------------------------------------------------------------------------
+Information operations,
 Graph neural networks,
 GraphSAINT,
 GraphSAGE,
-Twitter,
-Information operations
+SIGN,
+Twitter
 ===============================================================================
 About your team. * Please, describe your research group and its availability
 to work collaboratively with the Neocortex team during the 30-day Early User
@@ -22,17 +23,17 @@ Point of contact: Dr. John G. Wohlbier, jgwohlbier@sei.cmu.edu
 
 The Advanced Computing group in the Carnegie Mellon University, Software
 Engineering Institute (SEI), Emerging Technology Center has extensive
-experience at the intersection of data intensive AI/ML computing and new and
+experience at the intersection of data intensive AI/ML computing and
 emerging hardware. The team serves as trusted government advisors for the DARPA
 Software Defined Hardware (SDH) and Domain Specific System on Chip (DSSoC)
-programs. Team members understand and can exploit very low level performance
+programs. Team members understand, and can exploit very low level performance
 characteristics, such as those that will be required to have success on
 Neocortex.
 
 https://www.linkedin.com/in/john-wohlbier-52a6b5a1/
-Wohlbier is a Senior Research Scientist at the SEI. He has over 15 years of
-experience in HPC and is the technical lead for the SEI's support to DARPA
-SDH and DSSoC.
+Dr. John Wohlbier is a Senior Research Scientist at the SEI. He has over 15
+years of experience in HPC and is the technical lead for the SEI's support to
+DARPA SDH and DSSoC.
 
 https://www.linkedin.com/in/scott-m-3785751/
 Dr. Scott McMillan is a Principal Member of the Research Staff at the SEI.
@@ -40,9 +41,9 @@ He has over two decades of experience in HPC, and is an active member of the
 GraphBLAS API specification committee.
 
 https://www.linkedin.com/in/annika-horgan-40b935162/
-Horgan is an Associate Software Developer at the SEI. She has considerable
-experience working with schedulers for advanced hardware, and provides
-data analytics expertise.
+Annika Horgan is an Associate Software Developer at the SEI. She has
+considerable experience working with schedulers for advanced hardware, and
+provides data analytics expertise.
 
 The team will be available to work with the Neocortex team during the EUP.
 Wohlbier has an existing working relationship with Dr. Natalia Vassilieva
