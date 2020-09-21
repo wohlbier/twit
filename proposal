@@ -64,16 +64,19 @@ use it to "build the necessary societal defenses and capacities to protect
 public conversation." Graph Neural Networks (GNNs) have proven powerful in
 recent years in combining AI/ML techniques applied to node attributes with
 underlying graph structure to perform node classification, link prediction,
-and community detection. We will study actor characteristics using a
-myriad of GNNs as applied too retweet graphs assembled from twitter data.
+and community detection. We will study state actor characteristics using a
+myriad of GNNs as applied to retweet graphs constructed from twitter data.
+Our characterizations will be shared with the community to advance the
+state of the art in understanding of information operations.
+
 We have assembled a collection of models using some of the most popular
 GNNs and applied it to the June 2020 data release which includes over
 32,000 users, 160,000 retweets, and 120,000,000 tweets. We will use Neocortex
-to apply our models to all of the existing Twitter information operations
+to apply our models to ALL of the existing Twitter information operations
 datasets, and expect to run the models in a timely manner. Our models include
-both those that require multiple instances of the graph adjacency matrix
-resident in memory, such as Scalable Inception Graph Neural Networks (SIGN),
-as well as those that follow a graph sampling paradigm, such as
+both those that require multiple instances of the full dense graph adjacency
+matrix resident in memory, such as Scalable Inception Graph Neural Networks
+(SIGN), as well as those that follow a graph sampling paradigm, such as
 GraphSAGE and GraphSAINT.
 
 ===============================================================================
@@ -112,26 +115,25 @@ Geometric https://github.com/rusty1s/pytorch_geometric. Our implementations
 are available at https://github.com/wohlbier/twit, which includes code for
 raw data processing and feature extraction.
 
-The number of layers and
-parameters depends on the GNN. Typical GNNs have only two or three layers,
-which can be confirmed in our code. The way GNNs exploit graph structure is
-through a single or multi-hop neighbor aggregation mechanism. Sampling based
-GNNs such as GraphSAGE and GraphSAINT use randomly sampled subsets of
-neighbors, and neighbors of neighbors, to avoid oftentimes exponential
-explosion of attribute aggregation. It is suspected that inclusion of
-additional neighbors during sampling can improve model fidelity, but most
+The number of layers and parameters depends on the GNN. Typical GNNs have
+only two or three layers, which can be confirmed in our code. The way GNNs
+exploit graph structure is through a single or multi-hop neighbor aggregation
+mechanism. Sampling based GNNs such as GraphSAGE and GraphSAINT use randomly
+sampled subsets of neighbors, and neighbors of neighbors, to avoid oftentimes
+exponential explosion of attribute aggregation. It is suspected that inclusion
+of additional neighbors during sampling can improve model fidelity, but most
 often it is not done for reasons of computational cost. On Neocortex we will
 study how large we can make neighbor samples, and the impact it has on
 fidelity and runtime.
 
-The SIGN architecture is formulated such that it
-can grow rapidly with a modest increase in the number of parameters, while
-implementations appearing in the literature use a small number of parameters.
-For example, in the inception like formulation the parameter $r$ appears
-as an exponent on the adjacency matrix. An adjacency matrix raised to several
-powers will quickly become dense and multiple copies of the dense
-adjacency matrix would need to be stored in memory. On Neocortex we will
-explore the practical limits of the SIGN architecture and how model
+The nature of the SIGN architecture is such that the memory requirements
+grow rapidly with a modest increase in an individual parameter value, while
+implementations appearing in the literature use a small a small value for
+this parameter. For example, in the inception like formulation of SIGN
+the parameter $r$ appears as an exponent on the adjacency matrix. An adjacency
+matrix raised to several powers will quickly become dense and multiple copies
+of the dense  adjacency matrix would need to be stored in memory. On Neocortex
+we will explore the practical limits of the SIGN architecture and how model
 fidelity will benefit from increasing parameters.
 
 ===============================================================================
@@ -145,12 +147,11 @@ any other consideration(s) you consider relevant.
 Our data consists of user information and tweets released by Twitter over the
 course of two years, as described here.
 https://transparency.twitter.com/en/reports/information-operations.html
-The releases contain users, tweets, and the media associated with the tweets
-stored in ASCII csv files.
-Both user and tweet data include 1 used to build features and to
-construct graphs. For the purposes of this work we will focus only on the
-user and tweet data, and not use the media data. The most recent data
-release included:
+The releases contain users, tweets, and the media associated with the tweets.
+Tweets and users are stored in ASCII csv files. User and tweet data are used
+to build features and to construct graphs. For the purposes of this work we
+will focus only on the user and tweet data, and not use the media data. The
+most recent data release included:
 China: 23,750 accounts,     427,903 tweets
 Russia: 1,152 accounts,   4,373,218 tweets
 Turkey: 7,340 accounts, 120,253,807 tweets
@@ -164,11 +165,11 @@ releases see https://github.com/wohlbier/twit/blob/master/README.md.
 
 Because we are excluding the media files, data volumes are modest and do
 not add up to much more than tens of gigabytes. In future work if we were
-to include media into our models then data volumes would quickly rise to
+to include media into our models, then data volumes would quickly rise to
 tens of terabytes.
 
 Extracting features from the data can take considerable time, but we expect
-to have most of the 0 extraction work done ahead of time.
+to have most of the feature extraction work done ahead of time.
 
 ===============================================================================
 Performance. * Please, share the training or inference performance you are
@@ -184,7 +185,7 @@ end dual socket Xeon Broadwell node. However, on Neocortex we plan to explore
 parameter spaces with deeper neighbor sampling that would cause CPU
 implementations to grind to a halt. The performance characteristics of GNNs
 are a mixture of sparse and dense operations. The fully connected
-layers of the neural network are dense, structured, single precisions floating
+layers of the neural network are dense, structured, single precision floating
 point operations with predictable behavior. On conventional architectures
 the sparse operations typically dominate the runtime due to their unstructured
 memory access patterns. In particular, accesses to main memory cost hundreds
@@ -197,9 +198,9 @@ initial work we do not expect that memory requirements will exceed the
 18GB of SRAM on the WSE, and therefore we do not expect to be limited by the
 1.2Tbps.
 
-Our models natively run with the 1 parallelism provided by PyTorch's
+Our models natively run with the intra-node parallelism provided by PyTorch's
 OpenMP backend. In particular, with no modifications to run invocation PyTorch
-consumes all 96 1 on our two socket box. In the past we have
+consumes all 96 hyper-threads on our two socket box. In the past we have
 demonstrated incremental performance improvements for workloads like GraphSAGE
 by taking great care with thread placement, especially with regard to
 placing forward and backwards threads on the same core. We have not studied
