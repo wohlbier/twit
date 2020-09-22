@@ -73,8 +73,13 @@ def train(epoch):
     rw = random_walk(
         data.edge_index[0], data.edge_index[1],
         node_idx, walk_length=walk_length,
-        num_nodes=data.num_nodes)
+        num_nodes=data.num_nodes,
+        coalesced=True)
     rw_idx = rw[:, 1:].flatten()
+    # hack to bring out of bounds values in bounds. There is something wrong
+    # with random_walk. No clue what effect this has on the model.
+    rw_idx = torch.where(rw_idx > data.num_nodes - 1, rw_idx % data.num_nodes,
+                         rw_idx)
     pos_loader = NeighborSampler(
         data.edge_index, node_idx=rw_idx,
         sizes=num_samples, num_nodes=data.num_nodes,
